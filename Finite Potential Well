@@ -1,111 +1,55 @@
----------------------------------------------------------------------------------
-
 import numpy as np
-
 import matplotlib.pyplot as plt
 
-
-
 ag_a0 = 1.88973   # 1 Angstrom = 1.88973 Bohr radius
-
 ev_ha = 0.0367493 # 1 eV = 0.0367493 Hartree
-
 for i in range(1,4):
-
  # Converting units
-
     if i==1:
-
         L  = 5*ag_a0
-
         V0 = 12*ev_ha
-
     elif i==2:
-
         L  = 10*ag_a0
-
         V0 = 3*ev_ha
-
     else:
-
         L  = 10*ag_a0
-
         V0 = 30*ev_ha
-
     # Energy range
-
     E     = np.linspace(0.0001, V0-0.0001, 5000) # Avoid division by zero
-
     k     = np.sqrt(2*E)
-
     kappa = np.sqrt(2*(V0-E))
 
-
-
     x= kappa/k
-
     y= np.tan(k*L/2)
-
     z= -1/np.tan(k*L/2)
 
-
-
     # Plots
-
     plt.figure()
-
     plt.plot([0,V0], [0,0], ':k')
-
     plt.plot(E, x, '-k', label='$\kappa/k$')
-
     plt.plot(E, y, '.b', label='$+\mathrm{tan}(kL/2)$')
-
     plt.plot(E, z, '.r', label='$-\mathrm{cot}(kL/2)$')
 
-
-
     #np.sign: Returns -1 if x < 0, 0 if x==0, 1 if x > 0
-
     #numpy.argwhere: Find the indices of array elements that are non-zero, grouped by element
-
     #numpy.diff: Calculate the n-th discrete difference along the given axis
-
     #ndarray.flatten: Return a copy of the array collapsed into one dimension.
-
     #tolerances are implemented to avoid the sign changes in asymptotes
-
     tolerance_y = np.abs(np.diff(x-y)).mean()
-
     idy = np.argwhere((np.diff(np.sign(x - y)) != 0) & (np.abs(np.diff(x-y)) <= tolerance_y)).flatten()
-
     tolerance_z = np.abs(np.diff(x-y)).mean()
-
     idz = np.argwhere((np.diff(np.sign(x - z)) != 0) & (np.abs(np.diff(x-z)) <= tolerance_z)).flatten()
-
     
-
     plt.plot(E[idy], x[idy], 'co', label='Intersection')
-
     plt.plot(E[idz], x[idz], 'co')
-
     E_i=np.concatenate((idy,idz))
-
     E_i.sort()
-
     print('Eigenenergies are:',E[E_i],'in Hartree')
-
     
-
     plt.title('Case: %d' %i, fontsize=15)
-
     plt.xlim(0, V0)
-
     plt.ylim(-5, 10)
-
     plt.xlabel('$E\,(\mathrm{Hartree})$', fontsize=12)
-
     plt.legend(loc='best', fontsize=10)
-
-
 
     plt.show()
